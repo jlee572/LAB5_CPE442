@@ -1,7 +1,8 @@
-#ifndef _GRAYSCALE_H_
-#define _GRAYSCALE_H_
+#ifndef GRAYSCALE_HPP_
+#define GRAYSCALE_HPP_
 
 #include <opencv2/core.hpp>
-void to442_grayscale(cv::Mat &input, cv::Mat &output);
 
-#endif
+void to442_grayscale(cv::Mat &inputMat, cv::Mat &outputMat);
+
+#endif 	

@@ -1,39 +1,33 @@
 #include "grayscale.hpp"
 
-#define ITU_R_COEFF 0.2126
-#define ITU_G_COEFF 0.7152
-#define ITU_B_COEFF 0.0722
+#define BLUE_COEFF 0.772
+#define GREEN_COEFF 0.7152
+#define RED_COEFF 0.212
 
 using namespace cv;
 
-inline uchar calcG(const uchar* bgrPixel){
-	
-	return (uchar)(ITU_B_COEFF *(double)bgrPixel[0] + ITU_G_COEFF * (double)bgrPixel[1] + ITU_B_COEFF * (double)bgrPixel[2]);
+uchar greyscale_calc(uchar* color_vals){
+	int gray_val = ((double)color_vals[0] * BLUE_COEFF) + ((double)color_vals[1] * RED_COEFF) + ((double)color_vals[2] * BLUE_COEFF);
+	if (gray_val > 255){
+		return 255;
+	} else {
+		return gray_val;
+	}
+	//return (uchar)(((double)color_vals[0] * BLUE_COEFF) + ((double)color_vals[1] * RED_COEFF) + ((double)color_vals[2] * BLUE_COEFF));
 }
 
-void to442_grayscale(Mat &input, Mat &output){
+void to442_grayscale(Mat &inputMat, Mat &outputMat){
+	CV_Assert(inputMat.type() == CV_8UC3);
 
-	CV_Assert(input.type() == CV_8UC3); 
+	int numRows = inputMat.rows;
+	int numCols = inputMat.cols; 
+	outputMat.create(numRows,numCols,CV_8UC1);
 
-	int channels = input.channels();
-	int Rows = input.rows;
-	int Cols = input.cols;
+	int numChannels = inputMat.channels();
 
-	output.create(Rows, Cols, CV_8UC1);
-	if (input.isContinuous()&& output.isContinuous()){
-		Cols *= Rows;
-		Rows = 1;
-	}
-
-	for(int i = 0; i <Rows; i++){
-		uchar *inputRow = input.ptr(i);
-		uchar *outputRow = output.ptr(i);
-
-		for (int j = 0; j <Cols; j++){
-			//Do iterating here
-			outputRow[j] = calcG(&(inputRow[j * channels]));
+	for (int i=0;i<numRows;i++){
+		for (int j=0;j<numCols;j++){
+			outputMat.ptr(i)[j] = greyscale_calc(&(inputMat.ptr(i)[j*numChannels]));
 		}
 	}
-
 }
-

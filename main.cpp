@@ -2,8 +2,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <cmath>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,51 +12,66 @@
 
 using namespace cv;
 
-
-int main(int argc, char *argv[]){
-
-	VideoCapture cap("cartoon.mp4");//open video in directory
-	while (true) {
-		pthread_t thread1, thread2;
-		Mat frame, grayscale, edges; //initialize
-		cap.read(frame);
+void splitFrame(Mat &currMat){
+	//split the image into 2
+	Mat topHalfMat, bottomHalfMat;
+	int nRows = currMat.rows;
+	int nCols = currMat.cols;
+	int halfRows = nRows/2;
 	
-	//	pthread_create(&thread1, NULL, split_thread
-
-		if (frame.empty())
-			break;
-
-		to442_grayscale(frame, grayscale);
-		to442_sobel(grayscale, edges);
-
-		imshow("Bunny", edges); //displays image on screen
-		waitKey(1); //delay to keep consistency
+	if ((nRows % 2) == 0){
+		//even number of rows
+		topHalfMat.create(halfRows,nCols,CV_8UC3);				
+		bottomHalfMat.create(halfRows,nCols,CV_8UC3);
+	} else {
+		//odd number of rows
+		topHalfMat.create(halfRows,nCols,CV_8UC3);				
+		bottomHalfMat.create(halfRows+1,nCols,CV_8UC3);
 	}
+
+	
+	for (int i=0; i<halfRows; i++){
+		Vec3b *currRow = currMat.ptr<Vec3b>(i);
+		Vec3b *topHalfRow = topHalfMat.ptr<Vec3b>(i);
+		Vec3b *bottomHalfRow = bottomHalfMat.ptr<Vec3b>(i);
+
+		for (int j=0; j<nCols; j++){
+			int jColorCell = j*3;
+
+		// 	topHalfRow[jColorCell] = currRow[jColorCell];
+		// 	topHalfRow[jColorCell+1] = currRow[jColorCell+1];	
+		// 	topHalfRow[jColorCell+2] = currRow[jColorCell+2];
+		// }	
+		topHalfRow[j] = currRow[j];
+		//topHalfRow[j] = currRow[j];	
+		//topHalfRow[j] = currRow[j];
+		}
+
+	}
+
+	
+
+	//to442_grayscale(currFrame, grayFrame);
+	//to442_sobel(grayFrame, sobelFrame);
+
+	imshow("Top Half",topHalfMat);
+	waitKey(1);
 }
 
-void split_thread(Mat &input){
-//pthread mutex lock
-//create two mat objects with half the rows, keep colums same dimensions same
-//pthread mutex unlock
-        int input.rows = nRows;
-	int input.Cols = nCols;
-        int halfnRows = nRows/2;
-	if (nRows % 2 == 0){
-		Mat.create(halfnRows, nCols, CV_8UC3);
-                Mat.create(halfnRows, nCols, CV_8UC3);
 
-        for(int i = 0; i <Rows; i++){
-                uchar *inputRow = input.ptr(i);
-                uchar *outputRow = output.ptr(i);
+int main(int argc, char *argv[]){
+	Mat currFrame, outputFrame;
 
-                for (int j = 0; j <Cols; j++){
-                        //Do iterating here
-                        outputRow[j] = calcG(&(inputRow[j * channels]));
+	VideoCapture cap("cartoon.mp4");
+	//VideoCapture cap(0);
 
-	} else {
-        	Mat.create(nRows, nCols, CV_8UC3)
-                Mat.create(halfnRows+1, nCols, CV_8UC3);
+	while(1) {
+		cap.read(currFrame);
+		splitFrame(currFrame);
+		//imshow("Sobel Filter",outputFrame);
+		//waitKey(1);
 	}
+	return -1;
 }
 
 

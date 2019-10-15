@@ -1,9 +1,9 @@
 CC=g++
-PROGRAM_NAME=sobel
-CFLAGS=-Wall -Werror -g
-LDFLAGS=-lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lm
-C_HEADERS=grayscale.hpp sobel.hpp
-C_SOURCES=main.cpp grayscale.cpp sobel.cpp
+PROGRAM_NAME=sobel_filter
+CFLAGS=-Wall -g
+LDFLAGS=-lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lm 
+C_HEADERS=sobel.hpp grayscale.hpp
+C_SOURCES=main.cpp sobel.cpp grayscale.cpp
 
 all: $(C_HEADERS) $(C_SOURCES)
 	$(CC) -o $(PROGRAM_NAME) $(CFLAGS) $(C_SOURCES) $(LDFLAGS)
