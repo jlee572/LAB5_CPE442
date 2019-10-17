@@ -4,6 +4,6 @@
 
 #include <opencv2/core.hpp>
 
-void to442_sobel(cv::Mat &inputGsMat, cv::Mat &outputMat);
+void* to442_sobel(cv::Mat &input, cv::Mat &output);
 
 #endif 

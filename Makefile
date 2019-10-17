@@ -1,7 +1,7 @@
 CC=g++
 PROGRAM_NAME=sobel_filter
 CFLAGS=-Wall -g
-LDFLAGS=-lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lm 
+LDFLAGS=-lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lpthread -lm 
 C_HEADERS=sobel.hpp grayscale.hpp
 C_SOURCES=main.cpp sobel.cpp grayscale.cpp
 
