@@ -16,14 +16,14 @@ using namespace cv;
 Mat topHalfMat_in, bottomHalfMat_in;
 Mat topHalfMatOut, bottomHalfMatOut;
 
-void* filterTop(void* foo){
+void filterTop(){
 	//need to recast topMat here
 	Mat grayMat;
 	to442_grayscale(topHalfMat_in,grayMat);
 	to442_sobel(grayMat,topHalfMatOut);
 }
 
-void* filterBottom(void* foo){
+void filterBottom(){
 	//need to recast topMat here
 	Mat grayMat;
 	to442_grayscale(bottomHalfMat_in,grayMat);
@@ -63,19 +63,29 @@ void splitFrame(Mat &currMat){
 	}
 
 
-	pthread_t thread1, thread2;
+//	pthread_t thread1, thread2;
 
 	// threadArgs thread1Args = {topHalfMat_in, topHalfMat_out};
 	// threadArgs thread2Args = {bottomHalfMat_in, bottomHalfMat_out};
 	
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-	void *foo;
+//	pthread_attr_t attr;
+//	pthread_attr_init(&attr);
+//	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+//	int *foo;
 	//int thread1Ret = pthread_create(&thread1, NULL, to442_grayscale, (void *)topHalfMat_in);
 	
-	int thread1Ret = pthread_create(&thread1, &attr, filterTop, foo);
-	int thread2Ret = pthread_create(&thread2, &attr, filterBottom, foo);
+	//int thread1Ret = pthread_create(&thread1, NULL, filterTop, foo);
+	//int thread2Ret = pthread_create(&thread2, NULL, filterBottom, foo);
+	
+}
+void* wrapperFunc1(void *foo){
+        filterTop();
+	imshow("Sobel Filter Top",topHalfMatOut);
+}
+
+void* wrapperFunc2(void *foo){
+        filterBottom();
+        imshow("Sobel Filter Bottom",bottomHalfMatOut);
 }
 
 
@@ -83,14 +93,27 @@ int main(int argc, char *argv[]){
 	Mat currFrame;
 
 	VideoCapture cap("cartoon.mp4");
-	//VideoCapture cap(0);
+        pthread_t thread1, thread2;
+
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	int *foo1;
+	int *foo2;
+	
 
 	while(1) {
 		cap.read(currFrame);
 		splitFrame(currFrame);
-		imshow("Sobel Filter",topHalfMatOut);
+	        int thread1Ret = pthread_create(&thread1, NULL, wrapperFunc1, foo1);
+                int thread2Ret = pthread_create(&thread2, NULL, wrapperFunc2, foo2);
+
+		pthread_join(thread1, NULL);
+                pthread_join(thread2, NULL);
+
 		waitKey(1);
 	}
+	
 	return -1;
 }
 
