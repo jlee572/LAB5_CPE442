@@ -13,8 +13,22 @@
 using namespace cv;
 
 //Global vars
-Mat topHalfMat, bottomHalfMat;
+Mat topHalfMat_in, bottomHalfMat_in;
 Mat topHalfMatOut, bottomHalfMatOut;
+
+int filterTop(void* &topMat){
+	//need to recast topMat here
+	Mat grayMat;
+	to442_grayscale(topMat,grayMat);
+	to442_sobel(grayMat,topHalfMatOut);
+}
+
+int filterBottom(void* &inputMat){
+	//need to recast topMat here
+	Mat grayMat;
+	to442_grayscale(inputMat,grayMat);
+	to442_sobel(grayMat,bottomHalfMatOut);
+}
 
 void splitFrame(Mat &currMat){
 	//split the image into 2
@@ -59,23 +73,10 @@ void splitFrame(Mat &currMat){
 	
 	//int thread1Ret = pthread_create(&thread1, NULL, to442_grayscale, (void *)topHalfMat_in);
 	
-	int thread1Ret = pthread_create(&thread1, &attr, filtering, (void *)topHalfMat_in);
-	int thread2Ret = pthread_create(&thread2, &attr, filtering, (void *)bottomHalfMat_in);
+	int thread1Ret = pthread_create(&thread1, &attr, filterTop, (void *)topHalfMat_in);
+	int thread2Ret = pthread_create(&thread2, &attr, filterBottom, (void *)bottomHalfMat_in);
 }
 
-
-
-int filterTop(Mat &topMat){
-	Mat grayMat;
-	to442_grayscale(topMat,grayMat);
-	to442_sobel(grayMat,topHalfMat_out);
-}
-
-int filterBottom(Mat &inputMat){
-	Mat grayMat;
-	to442_grayscale(inputMat,grayMat);
-	to442_sobel(grayMat,bottomHalfMat_out);
-}
 
 int main(int argc, char *argv[]){
 	Mat currFrame, outputFrame;
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]){
 	while(1) {
 		cap.read(currFrame);
 		splitFrame(currFrame);
-		imshow("Sobel Filter",topHalfMat_out);
+		imshow("Sobel Filter",topHalfMatOut);
 		waitKey(1);
 	}
 	return -1;

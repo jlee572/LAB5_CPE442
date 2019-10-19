@@ -12,7 +12,7 @@ const int y_matrix[3][3] = {{-1,-2,-1},
 						   {0,0,0},
 						   {1,2,1}};
 
-void* to442_sobel(Mat &input, Mat &output){
+void to442_sobel(Mat &input, Mat &output){
 	CV_Assert(input.type() == CV_8UC1);
 
 	int nRows = input.rows;
