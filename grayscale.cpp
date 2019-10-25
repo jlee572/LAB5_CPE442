@@ -29,8 +29,10 @@ void to442_grayscale(Mat &inputMat, Mat &outputMat){
 			numCols *= numRows;
 			numRows = 1;
 	}
-	for (int i=0;i<numRows;i++){
-		for (int j=0;j<numCols;j++){
+	int i, j;
+	#pragma omp simd collapse(2)
+	for (i=0;i<numRows;i++){
+		for (j=0;j<numCols;j++){
 			outputMat.ptr(i)[j] = greyscale_calc(&(inputMat.ptr(i)[j*numChannels]));
 		}
 	}

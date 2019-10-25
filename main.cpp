@@ -61,31 +61,41 @@ void splitFrame(Mat &currMat){
 			bottomHalfRow[j] = currRowBottom[j];
 		}
 	}
-
-
-//	pthread_t thread1, thread2;
-
-	// threadArgs thread1Args = {topHalfMat_in, topHalfMat_out};
-	// threadArgs thread2Args = {bottomHalfMat_in, bottomHalfMat_out};
-	
-//	pthread_attr_t attr;
-//	pthread_attr_init(&attr);
-//	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-//	int *foo;
-	//int thread1Ret = pthread_create(&thread1, NULL, to442_grayscale, (void *)topHalfMat_in);
-	
-	//int thread1Ret = pthread_create(&thread1, NULL, filterTop, foo);
-	//int thread2Ret = pthread_create(&thread2, NULL, filterBottom, foo);
-	
 }
+
+void joinFrame(){
+        Mat outputMat;
+	int nRows = (topHalfMatOut.rows+bottomHalfMatOut.rows);
+        int nCols = topHalfMatOut.cols;
+        int halfRows = nRows/2;
+	outputMat.create(nRows, nCols, CV_8UC1);
+
+	for (int i=0; i<topHalfMatOut.rows; i++){
+		uchar *currRowTop = outputMat.ptr<uchar>(i);
+		uchar *currRowBottom = outputMat.ptr<uchar>(i+halfRows-1);
+		uchar *topHalfRow = topHalfMatOut.ptr<uchar>(i);
+                uchar *bottomHalfRow = bottomHalfMatOut.ptr<uchar>(i);
+
+		for(int j = 0; j<nCols; j++){
+			currRowTop[j] = topHalfRow[j];
+                	currRowBottom[j] = bottomHalfRow[j];
+		}
+	}
+
+	imshow("Rejoined Sobel Filter", outputMat);
+
+}
+
+	
+
 void* wrapperFunc1(void *foo){
         filterTop();
-	imshow("Sobel Filter Top",topHalfMatOut);
+	//imshow("Sobel Filter Top",topHalfMatOut);
 }
 
 void* wrapperFunc2(void *foo){
         filterBottom();
-        imshow("Sobel Filter Bottom",bottomHalfMatOut);
+        //imshow("Sobel Filter Bottom",bottomHalfMatOut);
 }
 
 
@@ -110,7 +120,7 @@ int main(int argc, char *argv[]){
 
 		pthread_join(thread1, NULL);
                 pthread_join(thread2, NULL);
-
+		joinFrame();
 		waitKey(1);
 	}
 	
